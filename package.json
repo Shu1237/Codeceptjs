@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@codeceptjs/configure": "^1.0.2",
+    "@codeceptjs/helper": "^2.0.4",
+    "codeceptjs": "^3.7.2",
+    "dotenv": "^16.4.7",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.85.1",
+    "playwright": "^1.50.1"
+  }
+}
