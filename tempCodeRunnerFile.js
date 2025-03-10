@@ -57,4 +57,3 @@ const rl = readline.createInterface({
 rl.question("Tell me your request API:", (userInput) => {
   generateTestCase(userInput);
   rl.close();
-});

@@ -1,5 +1,7 @@
 require('dotenv').config();
+require('./heal');
 const { setHeadlessWhen, setCommonPlugins } = require('@codeceptjs/configure');
+const { request } = require('playwright');
 
 setHeadlessWhen(process.env.HEADLESS);
 setCommonPlugins();
@@ -26,7 +28,7 @@ exports.config = {
       enabled: false,
     },
     heal: {
-      enabled: false,
+      enabled: true,
     },
   }
 };
