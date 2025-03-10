@@ -1,9 +1,14 @@
 require('dotenv').config();
-require('./heal');
-const { setHeadlessWhen, setCommonPlugins } = require('@codeceptjs/configure');
-const { request } = require('playwright');
 
-setHeadlessWhen(process.env.HEADLESS);
+// Kiểm tra xem file heal.js có tồn tại không trước khi require
+const fs = require('fs');
+if (fs.existsSync('./heal.js')) {
+  require('./heal');
+}
+
+const { setHeadlessWhen, setCommonPlugins } = require('@codeceptjs/configure');
+
+setHeadlessWhen(process.env.HEADLESS === 'true');
 setCommonPlugins();
 
 exports.config = {
@@ -12,8 +17,10 @@ exports.config = {
   helpers: {
     Playwright: {
       browser: 'chromium',
-      url: 'http://google.com',
-      show: true
+      url: 'https://www.google.com/',
+      show: true,
+      waitForTimeout: 5000,
+      smartWait: 3000 // Giảm thời gian chờ để tối ưu tốc độ
     },
     AI: {
       require: './helpers/ai_helper.js'
@@ -25,10 +32,17 @@ exports.config = {
   name: 'demo2',
   plugins: {
     screenshotOnFail: {
-      enabled: false,
+      enabled: true, // ✅ Bật tính năng chụp màn hình khi test fail
+      fullPage: true
     },
     heal: {
       enabled: true,
+      require: './plugin/heal_plugin.js',
+      debug: true
     },
+    retryFailedStep: {
+      enabled: true,
+      retries: 2
+    }
   }
 };
