@@ -1,16 +1,21 @@
 const event = require('codeceptjs').event;
+const AIHelper = require('../helpers/ai_helper');
 
 module.exports = function () {
-  event.dispatcher.on(event.test.failed, (test, err) => {
+  event.dispatcher.on(event.test.failed, async (test, err) => {
     console.log("\n🔴 Test failed: ", test.title);
-    console.log("🛠️ Heal Plugin is trying to fix the issue...");
+    console.log("📌 Lỗi chi tiết: ", err.message);
 
-    // Ví dụ: Thử sửa selector lỗi
-    if (err.message.includes('Field "input[name="q"]" was not found')) {
-      console.log("✅ Sửa lại selector: Đổi input[name='q'] thành textarea[name='q']");
+    // Gọi AI để phân tích lỗi
+    const fixSuggestion = await AIHelper.suggestFix(err.message);
+
+    console.log("🛠️ AI đề xuất sửa lỗi: ", fixSuggestion);
+
+    // Nếu có sửa, chạy lại test
+    if (fixSuggestion) {
+      console.log("🔄 Thử chạy lại test với sửa chữa AI...");
+      await AIHelper.retryTest(test.file);
     }
-
-    console.log("📌 Chi tiết lỗi: ", err.stack);
   });
 
   event.dispatcher.on(event.test.passed, (test) => {

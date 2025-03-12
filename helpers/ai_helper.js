@@ -1,39 +1,46 @@
-// helpers/ai_helper.js
-const fetch = require('node-fetch');
-const Helper = require('@codeceptjs/helper');
+const { Helper } = require("codeceptjs");
+const axios = require("axios");
+require("dotenv").config();
 
-class AI extends Helper {
-  async request(messages) {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    
+class AIHelper extends Helper {
+  constructor(config) {
+    super(config);
+    this.apiKey = process.env.OPENROUTER_API_KEY;
+    this.apiUrl = "https://openrouter.ai/api/v1/chat/completions";
+  }
+
+  async suggestFix(errorMessage) {
+    console.log("🤖 AI đang phân tích lỗi...");
+
     try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "deepseek/deepseek-chat:free",
-          messages: messages
-        })
-      });
+      const response = await axios.post(
+        `${this.apiUrl}?key=${this.apiKey}`,
+        {
+          prompt: `Bạn là chuyên gia kiểm thử tự động. Hãy phân tích lỗi sau và đề xuất cách sửa chữa: ${errorMessage}`,
+          temperature: 0.7,
+          max_tokens: 200,
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (!data.choices || data.choices.length === 0) {
-        throw new Error("No response from DeepSeek");
-      }
-
-      return data.choices[0].message.content;
+      return response.data.candidates[0].output || "Không có gợi ý từ AI.";
     } catch (error) {
-      console.error("Error in AI helper:", error.message);
-      throw error;
+      console.error("❌ Lỗi khi gọi API Gemma:", error.response?.data || error.message);
+      return "Không thể lấy gợi ý sửa lỗi từ AI.";
     }
+  }
+
+  async retryTest(testFile) {
+    console.log(`🔄 Chạy lại test: ${testFile}`);
+    const { exec } = require("child_process");
+
+    exec(`npx codeceptjs run --grep "${testFile}"`, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`❌ Lỗi khi chạy lại test: ${stderr}`);
+      } else {
+        console.log(`✅ Kết quả test mới: ${stdout}`);
+      }
+    });
   }
 }
 
-module.exports = AI;
+module.exports = AIHelper;

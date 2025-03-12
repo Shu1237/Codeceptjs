@@ -1,8 +1,10 @@
+
 Feature('Google Search');
 
-Scenario('Search with incorrect selector', ({ I }) => {
+Scenario('Search with correct selector', async ({ I }) => {
     I.amOnPage('https://www.google.com');
-    I.fillField('input[name="wrong_q"]', 'CodeceptJS'); // Sai selector
+    I.fillField('//input[@name="q"]', 'CodeceptJS');
     I.pressKey('Enter');
-    I.see('CodeceptJS');
+    I.waitForElement('//div[@id="search"]', 10);
+    I.seeElement('//div[@id="search"]');
 });
