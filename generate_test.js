@@ -5,7 +5,7 @@ const fs = require('fs');// read and write file
 const path = require('path'); // manages file paths to ensure correct storage locations.
 
 async function generateTestCase(userInput) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = process.env.OPENROUTER_API_KEY; //   => from .env 
   if (!apiKey) {
     console.error(" Error: API Key is missing. Please check your .env file.");
     return;
