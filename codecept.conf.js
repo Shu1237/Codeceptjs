@@ -10,15 +10,17 @@ require("./heal"); // Đảm bảo file heal.js tồn tại nếu bạn require 
 
 /** @type {CodeceptJS.MainConfig} */
 exports.config = {
-  tests: './tests/*_test.js',
+  tests: './End/*_test.js',
   output: './output',
   helpers: {
     Playwright: {
       browser: 'chromium',
-      url: 'http://localhost',
-      show: true, // Đồng bộ với setHeadlessWhen
+      url: 'http://127.0.0.1:5500/',
+      show: true,
     },
   },
+
+  
   include: {
     I: './steps_file.js',
   },
@@ -31,7 +33,7 @@ exports.config = {
         const response = await axios.post(
           'https://openrouter.ai/api/v1/chat/completions',
           {
-            model: 'google/gemma-2-27b-it:free', // Sửa tên model (gemma-3 không tồn tại trong free tier)
+            model: 'open-r1/olympiccoder-7b:free', // Sửa tên model (gemma-3 không tồn tại trong free tier)
             messages: messages, // Truyền messages trực tiếp
             temperature: 0.7,
             max_tokens: 200,

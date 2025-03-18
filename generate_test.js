@@ -16,11 +16,21 @@ async function generateTestCase(userInput) {
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "google/gemma-3-27b-it:free",
+        model: "open-r1/olympiccoder-7b:free",
         messages: [
           {
             role: "user",
-            content: `${userInput}. Please generate the test steps in pure CodeceptJS format without additional explanations or comments.`
+            content: `Generate a CodeceptJS test script using the following format:
+        
+            Feature('<Feature Name>');
+            
+            Scenario('<Scenario Description>', ({ I }) => {
+              // Test steps go here
+            });
+    
+            Please generate the test case based on my request: "${userInput}". 
+            Ensure the response strictly follows this format without additional explanations or comments.`
+          
           }
         ]
       },
