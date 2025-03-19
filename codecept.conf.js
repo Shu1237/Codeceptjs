@@ -1,63 +1,67 @@
 const { setHeadlessWhen, setCommonPlugins } = require('@codeceptjs/configure');
+// turn on headless mode when running with HEADLESS=true environment variable
+// export HEADLESS=true && npx codeceptjs run
+setHeadlessWhen(process.env.HEADLESS);
 
-// Turn on headless mode when running with HEADLESS=true environment variable
-setHeadlessWhen(process.env.HEADLESS === 'true');
-
-// Enable all common plugins
+// enable all common plugins https://github.com/codeceptjs/configure#setcommonplugins
 setCommonPlugins();
 
-require("./heal"); // Đảm bảo file heal.js tồn tại nếu bạn require nó
-
 /** @type {CodeceptJS.MainConfig} */
+require("./heal")
 exports.config = {
-  tests: './End/*_test.js',
+  tests: './tests/*_test.js',
   output: './output',
   helpers: {
     Playwright: {
       browser: 'chromium',
-      url: 'http://127.0.0.1:5500/',
-      show: true,
-    },
+      url: 'http://localhost',
+      show: true
+    }
+  },
+  include: {
+    I: './steps_file.js'
+  },
+  name: 'AI-Testing',
+
+  // openAI
+  // ai: {
+  //   request: async messages => {
+  //     const OpenAI = require('openai')
+  //     const openai = new OpenAI({apiKey: process.env['OPENAI_API_KEY']})
+  
+  //     const completion = await openai.chat.completions.create({
+  //       model: 'gpt-3.5-turbo',
+  //       messages,
+  //     })
+  
+  //     return completion?.choices[0]?.message?.content
+  //   }
+  // }
+
+  //groq
+  ai: {
+    request: async messages => {
+      const Groq = require('groq-sdk')
+  
+      const client = new Groq({
+        apiKey: process.env['GROQ_API_KEY'], // This is the default and can be omitted
+        apiKey: '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',
+      })
+  
+      const chatCompletion = await client.chat.completions.create({
+        messages,
+        model: 'mixtral-8x7b-32768',
+      })
+      return chatCompletion.choices[0]?.message?.content || ''
+    }
   },
 
   
-  include: {
-    I: './steps_file.js',
-  },
-  name: 'AI-Testing',
-  ai: {
-    request: async (messages) => { // Tham số phải là "messages" để khớp với định dạng chat
-      const axios = require('axios'); // Sử dụng axios để gọi API OpenRouter
 
-      try {
-        const response = await axios.post(
-          'https://openrouter.ai/api/v1/chat/completions',
-          {
-            model: 'open-r1/olympiccoder-7b:free', // Sửa tên model (gemma-3 không tồn tại trong free tier)
-            messages: messages, // Truyền messages trực tiếp
-            temperature: 0.7,
-            max_tokens: 200,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.OPENROUTER_API_KEY || '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'}`,
-              'Content-Type': 'application/json',
-            },
-            timeout: 10000,
-          }
-        );
 
-        return response.data.choices[0]?.message?.content || '';
-      } catch (error) {
-        console.error('❌ Lỗi khi gọi OpenRouter API:', error.message);
-        return null;
-      }
-    },
-  },
   plugins: {
     heal: {
-      enabled: true,
-      debug: true, // Thêm debug để xem log healing
+      enabled: true
     },
   },
 };

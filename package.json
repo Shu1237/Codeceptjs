@@ -3,6 +3,7 @@
     "@codeceptjs/configure": "^1.0.2",
     "@codeceptjs/helper": "^2.0.4",
     "dotenv": "^16.4.7",
+    "groq-sdk": "^0.17.0",
     "node-fetch": "^3.3.2",
     "openai": "^4.85.1",
     "playwright": "^1.50.1"
